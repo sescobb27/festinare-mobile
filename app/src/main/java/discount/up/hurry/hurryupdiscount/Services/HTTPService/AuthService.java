@@ -17,13 +17,13 @@ import java.io.UnsupportedEncodingException;
 
 import discount.up.hurry.hurryupdiscount.Services.SessionService.SessionService;
 
-public class AuthAsyncTask extends JsonHttpResponseHandler {
+public class AuthService extends JsonHttpResponseHandler {
 
     private AsyncHttpClient client;
     private AsyncHttpResponseHandler callback;
     private Context callbackContext;
 
-    public AuthAsyncTask() {
+    public AuthService() {
         super(HTTP.UTF_8);
         client = new AsyncHttpClient();
         client.addHeader(AsyncHttpClient.HEADER_ACCEPT_ENCODING, AsyncHttpClient.ENCODING_GZIP);
@@ -31,24 +31,28 @@ public class AuthAsyncTask extends JsonHttpResponseHandler {
 
     public void login(Context context, String username, String password, AsyncHttpResponseHandler responseHandler)
             throws JSONException, UnsupportedEncodingException {
-        JSONObject body = new JSONObject();
-        body.put("username", username);
-        body.put("password", password);
+        JSONObject credentials = new JSONObject();
+        credentials.put("username", username);
+        credentials.put("password", password);
+        JSONObject user = new JSONObject();
+        user.put("user", credentials);
         callback = responseHandler;
         callbackContext = context;
-        ByteArrayEntity entity = new ByteArrayEntity(body.toString().getBytes(HTTP.UTF_8));
+        ByteArrayEntity entity = new ByteArrayEntity(user.toString().getBytes(HTTP.UTF_8));
         client.post(context, HTTPCommons.LOGIN_URL, null, entity, "application/json" , this);
     }
 
     public void register(Context context, String email, String username, String password, AsyncHttpResponseHandler responseHandler)
             throws JSONException, UnsupportedEncodingException {
-        JSONObject body = new JSONObject();
-        body.put("email", email);
-        body.put("username", username);
-        body.put("password", password);
+        JSONObject credentials = new JSONObject();
+        credentials.put("email", email);
+        credentials.put("username", username);
+        credentials.put("password", password);
+        JSONObject user = new JSONObject();
+        user.put("user", credentials);
         callback = responseHandler;
         callbackContext = context;
-        ByteArrayEntity entity = new ByteArrayEntity(body.toString().getBytes(HTTP.UTF_8));
+        ByteArrayEntity entity = new ByteArrayEntity(user.toString().getBytes(HTTP.UTF_8));
         client.post(context, HTTPCommons.REGISTER_URL, null, entity, "application/json" , this);
     }
 
