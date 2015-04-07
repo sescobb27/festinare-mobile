@@ -1,19 +1,24 @@
 package discount.up.hurry.hurryupdiscount.Auth;
 
+import com.google.gson.Gson;
+
+import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,31 +32,31 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import discount.up.hurry.hurryupdiscount.Models.Mobile;
+import discount.up.hurry.hurryupdiscount.Models.User;
 import discount.up.hurry.hurryupdiscount.R;
 import discount.up.hurry.hurryupdiscount.Services.ConnectionDetectorService.ConnectionDetectorService;
-import discount.up.hurry.hurryupdiscount.Services.HTTPService.AuthAsyncTask;
+import discount.up.hurry.hurryupdiscount.Services.GCMService.GCMRegistrationService;
+import discount.up.hurry.hurryupdiscount.Services.GCMService.OnGCMRegister;
+import discount.up.hurry.hurryupdiscount.Services.HTTPService.AuthService;
+import discount.up.hurry.hurryupdiscount.Services.HTTPService.UserService;
 
 
-public class RegisterActivity extends ActionBarActivity implements
-        LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
+public class RegisterActivity extends Activity implements
+        LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener, OnGCMRegister {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private AutoCompleteTextView emailView;
-
     private EditText usernameView;
-
     private EditText passwordView;
-
     private EditText passwordConfirmationView;
-
     private View progressView;
-
     private View registerFormView;
-
     private Button registerButton;
-
-    private AuthAsyncTask auth;
+    private AuthService auth;
+    private GCMRegistrationService gcmRegistrationService;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +89,7 @@ public class RegisterActivity extends ActionBarActivity implements
         registerButton = (Button) findViewById(R.id.register_button);
         registerButton.setOnClickListener(this);
 
-        auth = new AuthAsyncTask();
+        auth = new AuthService();
     }
 
     // You need to do the Play Services APK check here too.
@@ -146,8 +151,10 @@ public class RegisterActivity extends ActionBarActivity implements
     private boolean isValidPassword() {
         String password = passwordView.getText().toString();
         String passwordConfirmation = passwordConfirmationView.getText().toString();
-        return !password.isEmpty() && !passwordConfirmation.isEmpty() && password
-                .equals(passwordConfirmation);
+        return !password.isEmpty() &&
+                password.length() >= 8 &&
+                !passwordConfirmation.isEmpty() &&
+                password.equals(passwordConfirmation);
     }
 
     @Override
@@ -156,21 +163,28 @@ public class RegisterActivity extends ActionBarActivity implements
             case R.id.register_button:
                 if (isValidPassword()) {
                     try {
+                        final Context applicationContext = getApplicationContext();
+                        final RegisterActivity self = this;
                         auth.register(
-                                getApplicationContext(),
-                                emailView.getText().toString(),
-                                usernameView.getText().toString(),
-                                passwordView.getText().toString(),
-                                new JsonHttpResponseHandler() {
-                                    @Override
-                                    public void onSuccess(int statusCode, Header[] headers,
-                                            JSONObject response) {
-                                        android.util.Log.i("USER: ", response.toString());
-                                    }
-                                });
+                            getApplicationContext(),
+                            emailView.getText().toString(),
+                            usernameView.getText().toString(),
+                            passwordView.getText().toString(),
+                            new JsonHttpResponseHandler() {
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    Gson gson = new Gson();
+                                    android.util.Log.i("REGISTER USER: ", response.toString());
+                                    user = gson.fromJson(response.toString(), User.class);
+                                    gcmRegistrationService = new GCMRegistrationService(applicationContext, self);
+                                    gcmRegistrationService.getGcmRegistrationIdOrRegister();
+                                }
+                            });
                     } catch (JSONException e) {
+                        // TODO
                         e.printStackTrace();
                     } catch (UnsupportedEncodingException e) {
+                        // TODO
                         e.printStackTrace();
                     }
                 }
@@ -219,5 +233,34 @@ public class RegisterActivity extends ActionBarActivity implements
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    public void onGCMRegister(Mobile mobile) {
+        if ( gcmRegistrationService.needsGCMKeyUpdate() ) {
+            UserService userService = new UserService();
+            try {
+                userService.mobile(getApplicationContext(), user, mobile, new JsonHttpResponseHandler(HTTP.UTF_8) {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+                        // GOTO MAIN_ACTIVITY
+                        android.util.Log.i("onGCMRegister", "SUCCESS");
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
+                        // TODO
+                        android.util.Log.e(AsyncHttpClient.LOG_TAG, error.getMessage());
+                    }
+                });
+            } catch (JSONException e) {
+                // TODO
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                // TODO
+                e.printStackTrace();
+            }
+        }
     }
 }
