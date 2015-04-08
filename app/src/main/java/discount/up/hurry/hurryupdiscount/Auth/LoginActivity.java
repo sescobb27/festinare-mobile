@@ -29,6 +29,7 @@ import discount.up.hurry.hurryupdiscount.Models.User;
 import discount.up.hurry.hurryupdiscount.R;
 import discount.up.hurry.hurryupdiscount.Services.ConnectionDetectorService.ConnectionDetectorService;
 import discount.up.hurry.hurryupdiscount.Services.HTTPService.AuthService;
+import discount.up.hurry.hurryupdiscount.Services.SessionService.SessionService;
 
 /**
  * A login screen that offers login via email/password.
@@ -56,7 +57,14 @@ public class LoginActivity extends Activity implements OnClickListener {
         if (checkPlayServices()) {
             ConnectionDetectorService connDetector = ConnectionDetectorService.getConnectionDetector(getApplicationContext());
             if (connDetector.isConnectedToInternet()) {
-                setup();
+                auth = new AuthService();
+                SessionService sessionService = new SessionService(getApplicationContext());
+                String token = sessionService.getAPIToken();
+                if (!token.isEmpty()) {
+                    loginByToken(token);
+                } else {
+                    setup();
+                }
             } else {
                 android.util.Log.i("HurryUpDiscount", "Activa los datos o conectate al wifi mas cercano");
                 Toast.makeText(currentContext, "Activa los datos o conectate al wifi mas cercano", Toast.LENGTH_LONG).show();
@@ -78,8 +86,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-
-        auth = new AuthService();
     }
 
 
@@ -113,11 +119,38 @@ public class LoginActivity extends Activity implements OnClickListener {
     }
 
     /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
+     * Attempts to sign in the account specified by stored token.
      */
-    public void attemptLogin() {
+    private void loginByToken(String token) {
+        auth.me(getApplicationContext(), token, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Gson gson = new Gson();
+                android.util.Log.i("LOGIN USER: ", response.toString());
+                user = gson.fromJson(response.toString(), User.class);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.putExtra("user", user);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                // TODO
+            }
+        });
+    }
+
+    /**
+     * Attempts to sign in or register the account specified by the login form.
+     */
+    private void loginByCredentials() {
         // Store values at the time of the login attempt.
         String username = mUsernameView.getText().toString();
         String password = mPasswordView.getText().toString();
@@ -219,7 +252,7 @@ public class LoginActivity extends Activity implements OnClickListener {
                 finish();
                 break;
             case R.id.login_button:
-                attemptLogin();
+                loginByCredentials();
                 break;
         }
     }
