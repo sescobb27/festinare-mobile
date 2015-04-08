@@ -2,18 +2,16 @@ package discount.up.hurry.hurryupdiscount.Auth;
 
 import com.google.gson.Gson;
 
-import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
-import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -32,18 +30,15 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import discount.up.hurry.hurryupdiscount.Models.Mobile;
+import discount.up.hurry.hurryupdiscount.Activities.MainActivity;
 import discount.up.hurry.hurryupdiscount.Models.User;
 import discount.up.hurry.hurryupdiscount.R;
 import discount.up.hurry.hurryupdiscount.Services.ConnectionDetectorService.ConnectionDetectorService;
-import discount.up.hurry.hurryupdiscount.Services.GCMService.GCMRegistrationService;
-import discount.up.hurry.hurryupdiscount.Services.GCMService.OnGCMRegister;
 import discount.up.hurry.hurryupdiscount.Services.HTTPService.AuthService;
-import discount.up.hurry.hurryupdiscount.Services.HTTPService.UserService;
 
 
 public class RegisterActivity extends Activity implements
-        LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener, OnGCMRegister {
+        LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
@@ -55,7 +50,6 @@ public class RegisterActivity extends Activity implements
     private View registerFormView;
     private Button registerButton;
     private AuthService auth;
-    private GCMRegistrationService gcmRegistrationService;
     private User user;
 
     @Override
@@ -163,8 +157,6 @@ public class RegisterActivity extends Activity implements
             case R.id.register_button:
                 if (isValidPassword()) {
                     try {
-                        final Context applicationContext = getApplicationContext();
-                        final RegisterActivity self = this;
                         auth.register(
                             getApplicationContext(),
                             emailView.getText().toString(),
@@ -176,8 +168,22 @@ public class RegisterActivity extends Activity implements
                                     Gson gson = new Gson();
                                     android.util.Log.i("REGISTER USER: ", response.toString());
                                     user = gson.fromJson(response.toString(), User.class);
-                                    gcmRegistrationService = new GCMRegistrationService(applicationContext, self);
-                                    gcmRegistrationService.getGcmRegistrationIdOrRegister();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Intent
+                                                    intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                            intent.putExtra("user", user);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                                    // TODO
                                 }
                             });
                     } catch (JSONException e) {
@@ -235,32 +241,4 @@ public class RegisterActivity extends Activity implements
 
     }
 
-    @Override
-    public void onGCMRegister(Mobile mobile) {
-        if ( gcmRegistrationService.needsGCMKeyUpdate() ) {
-            UserService userService = new UserService();
-            try {
-                userService.mobile(getApplicationContext(), user, mobile, new JsonHttpResponseHandler(HTTP.UTF_8) {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
-                        // GOTO MAIN_ACTIVITY
-                        android.util.Log.i("onGCMRegister", "SUCCESS");
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
-                        // TODO
-                        android.util.Log.e(AsyncHttpClient.LOG_TAG, error.getMessage());
-                    }
-                });
-            } catch (JSONException e) {
-                // TODO
-                e.printStackTrace();
-            } catch (UnsupportedEncodingException e) {
-                // TODO
-                e.printStackTrace();
-            }
-        }
-    }
 }

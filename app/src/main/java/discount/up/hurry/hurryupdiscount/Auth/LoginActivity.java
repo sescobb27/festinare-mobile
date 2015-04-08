@@ -2,11 +2,9 @@ package discount.up.hurry.hurryupdiscount.Auth;
 
 import com.google.gson.Gson;
 
-import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
-import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,19 +24,16 @@ import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 
-import discount.up.hurry.hurryupdiscount.Models.Mobile;
+import discount.up.hurry.hurryupdiscount.Activities.MainActivity;
 import discount.up.hurry.hurryupdiscount.Models.User;
 import discount.up.hurry.hurryupdiscount.R;
 import discount.up.hurry.hurryupdiscount.Services.ConnectionDetectorService.ConnectionDetectorService;
-import discount.up.hurry.hurryupdiscount.Services.GCMService.GCMRegistrationService;
-import discount.up.hurry.hurryupdiscount.Services.GCMService.OnGCMRegister;
 import discount.up.hurry.hurryupdiscount.Services.HTTPService.AuthService;
-import discount.up.hurry.hurryupdiscount.Services.HTTPService.UserService;
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends Activity implements OnClickListener, OnGCMRegister {
+public class LoginActivity extends Activity implements OnClickListener {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
@@ -49,7 +44,6 @@ public class LoginActivity extends Activity implements OnClickListener, OnGCMReg
     private View mLoginFormView;
     private AuthService auth;
     private User user;
-    private GCMRegistrationService gcmRegistrationService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +56,6 @@ public class LoginActivity extends Activity implements OnClickListener, OnGCMReg
         if (checkPlayServices()) {
             ConnectionDetectorService connDetector = ConnectionDetectorService.getConnectionDetector(getApplicationContext());
             if (connDetector.isConnectedToInternet()) {
-                GCMRegistrationService gcmRegistrationService = new GCMRegistrationService(getApplicationContext(), this);
-                gcmRegistrationService.getGcmRegistrationIdOrRegister();
                 setup();
             } else {
                 android.util.Log.i("HurryUpDiscount", "Activa los datos o conectate al wifi mas cercano");
@@ -105,7 +97,8 @@ public class LoginActivity extends Activity implements OnClickListener, OnGCMReg
      * the Google Play Store or enable it in the device's system settings.
      */
     private boolean checkPlayServices() {
-        int resultCode = com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        int resultCode = com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable(
+                this);
         if (resultCode != com.google.android.gms.common.ConnectionResult.SUCCESS) {
             if (com.google.android.gms.common.GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
                 com.google.android.gms.common.GooglePlayServicesUtil.getErrorDialog(resultCode, this,
@@ -135,8 +128,6 @@ public class LoginActivity extends Activity implements OnClickListener, OnGCMReg
             // perform the user login attempt.
             showProgress(true);
             try {
-                final Context applicationContext = getApplicationContext();
-                final LoginActivity self = this;
                 auth.login(
                     getApplicationContext(),
                     mUsernameView.getText().toString(),
@@ -147,8 +138,22 @@ public class LoginActivity extends Activity implements OnClickListener, OnGCMReg
                             Gson gson = new Gson();
                             android.util.Log.i("LOGIN USER: ", response.toString());
                             user = gson.fromJson(response.toString(), User.class);
-                            gcmRegistrationService = new GCMRegistrationService(applicationContext, self);
-                            gcmRegistrationService.getGcmRegistrationIdOrRegister();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    intent.putExtra("user", user);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            });
+                        }
+
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                            super.onFailure(statusCode, headers, throwable, errorResponse);
+                            // TODO
                         }
                     });
             } catch (JSONException e) {
@@ -175,7 +180,7 @@ public class LoginActivity extends Activity implements OnClickListener, OnGCMReg
         {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
             mLoginFormView.animate().setDuration(shortAnimTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter()
             {
@@ -219,35 +224,6 @@ public class LoginActivity extends Activity implements OnClickListener, OnGCMReg
         }
     }
 
-    @Override
-    public void onGCMRegister(Mobile mobile) {
-        if ( gcmRegistrationService.needsGCMKeyUpdate() ) {
-            UserService userService = new UserService();
-            try {
-                userService.mobile(getApplicationContext(), user, mobile, new JsonHttpResponseHandler(
-                        HTTP.UTF_8) {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
-                        // GOTO MAIN_ACTIVITY
-                        android.util.Log.i("onGCMRegister", "SUCCESS");
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
-                        // TODO
-                        android.util.Log.e(AsyncHttpClient.LOG_TAG, error.getMessage());
-                    }
-                });
-            } catch (JSONException e) {
-                // TODO
-                e.printStackTrace();
-            } catch (UnsupportedEncodingException e) {
-                // TODO
-                e.printStackTrace();
-            }
-        }
-    }
 }
 
 
