@@ -167,17 +167,23 @@ public class RegisterActivity extends Activity implements
                                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                     Gson gson = new Gson();
                                     android.util.Log.i("REGISTER USER: ", response.toString());
-                                    user = gson.fromJson(response.toString(), User.class);
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Intent
-                                                    intent = new Intent(RegisterActivity.this, MainActivity.class);
-                                            intent.putExtra("user", user);
-                                            startActivity(intent);
-                                            finish();
-                                        }
-                                    });
+                                    try {
+                                        JSONObject tmp = response.getJSONObject("user");
+                                        user = gson.fromJson(tmp.toString(), User.class);
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Intent
+                                                        intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                                intent.putExtra("user", user);
+                                                startActivity(intent);
+                                                finish();
+                                            }
+                                        });
+                                    } catch (JSONException e) {
+                                        // TODO
+                                        e.printStackTrace();
+                                    }
                                 }
 
                                 @Override

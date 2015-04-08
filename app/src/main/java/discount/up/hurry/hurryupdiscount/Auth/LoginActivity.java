@@ -127,16 +127,22 @@ public class LoginActivity extends Activity implements OnClickListener {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Gson gson = new Gson();
                 android.util.Log.i("LOGIN USER: ", response.toString());
-                user = gson.fromJson(response.toString(), User.class);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        intent.putExtra("user", user);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
+                try {
+                    JSONObject tmp = response.getJSONObject("user");
+                    user = gson.fromJson(tmp.toString(), User.class);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.putExtra("user", user);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                } catch (JSONException e) {
+                    // TODO
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -170,18 +176,23 @@ public class LoginActivity extends Activity implements OnClickListener {
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                             Gson gson = new Gson();
                             android.util.Log.i("LOGIN USER: ", response.toString());
-                            user = gson.fromJson(response.toString(), User.class);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    intent.putExtra("user", user);
-                                    startActivity(intent);
-                                    finish();
-                                }
-                            });
+                            try {
+                                JSONObject tmp = response.getJSONObject("user");
+                                user = gson.fromJson(tmp.toString(), User.class);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                        intent.putExtra("user", user);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                });
+                            } catch (JSONException e) {
+                                // TODO
+                                e.printStackTrace();
+                            }
                         }
-
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
