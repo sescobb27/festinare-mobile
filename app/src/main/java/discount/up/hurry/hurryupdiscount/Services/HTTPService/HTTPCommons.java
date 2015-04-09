@@ -5,8 +5,9 @@ import java.util.Map;
 import discount.up.hurry.hurryupdiscount.Tools.StrSubstitutor;
 
 public final class HTTPCommons {
-//    public static final String HOST_URL = "http://10.0.2.2:3000";
-    public static final String HOST_URL = "http://api.hurry-up.co:3000";
+    public static final String HOST_URL = "http://192.168.1.2:3000";        // development machine ip
+//    public static final String HOST_URL = "http://10.0.2.2:3000";         // AVD ip to route to host machine
+//    public static final String HOST_URL = "http://api.hurry-up.co:3000";  // 'production' server
 //    POST     /v1/users/login
     public static final String LOGIN_URL = HOST_URL + "/v1/users/login";
 //    POST     /v1/users
