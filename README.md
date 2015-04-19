@@ -93,8 +93,8 @@ req ->  headers  ->  "Authorization": "Bearer {{JWT}}"
 
 ### Get discounts
 ```ruby
-# if user doesn't have any liked category it is going to fetch all disccounts,
-# but if it does, it is goingt to fetch all discounts based on it's categories.
+# if user doesn't have any liked category it is going to fetch all discounts,
+# but if it does, it is going to fetch all discounts based on it's categories.
 GET /v1/discounts
 req       ->  headers  ->  "Authorization": "Bearer {{JWT}}"
           ->  params   ->  null

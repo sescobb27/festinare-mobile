@@ -1,4 +1,4 @@
-package discount.up.hurry.hurryupdiscount;
+package com.festinare.discount;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

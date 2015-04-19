@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="discount.up.hurry.hurryupdiscount" >
+    package="com.festinare.discount" >
 
-    <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="17" />
     <!--
      To retrieve OAuth 2.0 tokens or invalidate tokens to disconnect a user. This disconnect
      option is required to comply with the Google+ Sign-In developer policies
@@ -19,10 +16,10 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <permission
-        android:name="discount.up.hurry.hurryupdiscount.permission.C2D_MESSAGE"
+        android:name="com.festinare.discount.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="discount.up.hurry.hurryupdiscount.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.festinare.discount.permission.C2D_MESSAGE" />
     <uses-permission android:name="com.google.android.c2dm.intent.RECEIVE" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -42,7 +39,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".IndexActivity"
+            android:name="com.festinare.discount.IndexActivity"
             android:label="@string/title_activity_index" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,30 +48,30 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Auth.LoginActivity"
+            android:name="com.festinare.discount.auth.LoginActivity"
             android:label="@string/title_activity_login"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
         <activity
-            android:name=".Auth.RegisterActivity"
+            android:name="com.festinare.discount.auth.RegisterActivity"
             android:label="@string/title_activity_register"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
 
         <receiver
-            android:name=".Services.GCMService.GcmBroadcastReceiver"
+            android:name="com.festinare.discount.services.gcmService.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-                <category android:name="discount.up.hurry.hurryupdiscount" />
+                <category android:name="com.festinare.discount" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".Services.GCMService.GcmIntentService" />
+        <service android:name="com.festinare.discount.services.gcmService.GcmIntentService" />
 
         <activity
-            android:name=".Activities.MainActivity"
+            android:name="com.festinare.discount.ui.MainActivity"
             android:label="@string/title_activity_main" >
         </activity>
     </application>

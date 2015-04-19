@@ -8,7 +8,7 @@
               android:paddingLeft="@dimen/activity_horizontal_margin"
               android:paddingRight="@dimen/activity_horizontal_margin"
               android:paddingTop="@dimen/activity_vertical_margin"
-              tools:context="discount.up.hurry.hurryupdiscount.Auth.LoginActivity">
+              tools:context="com.festinare.discount.auth.LoginActivity">
 
     <!-- Login progress -->
     <ProgressBar

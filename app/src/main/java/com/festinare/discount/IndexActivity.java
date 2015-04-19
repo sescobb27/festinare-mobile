@@ -1,4 +1,4 @@
-package discount.up.hurry.hurryupdiscount;
+package com.festinare.discount;
 
 import android.content.*;
 import android.os.*;
@@ -6,7 +6,7 @@ import android.support.v7.app.*;
 import android.view.*;
 import java.util.*;
 
-import discount.up.hurry.hurryupdiscount.Auth.LoginActivity;
+import com.festinare.discount.auth.LoginActivity;
 
 
 public class IndexActivity extends ActionBarActivity
