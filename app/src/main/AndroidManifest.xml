@@ -48,18 +48,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.festinare.discount.auth.LoginActivity"
+            android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
         <activity
-            android:name="com.festinare.discount.auth.RegisterActivity"
+            android:name=".ui.RegisterActivity"
             android:label="@string/title_activity_register"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
 
         <receiver
-            android:name="com.festinare.discount.services.gcmService.GcmBroadcastReceiver"
+            android:name=".tools.gcm.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -68,7 +68,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.festinare.discount.services.gcmService.GcmIntentService" />
+        <service android:name=".tools.gcm.GcmIntentService" />
 
         <activity
             android:name="com.festinare.discount.ui.MainActivity"

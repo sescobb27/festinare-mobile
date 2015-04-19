@@ -1,21 +1,21 @@
-package com.festinare.discount.services.connectionDetectorService;
+package com.festinare.discount.tools;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-public class ConnectionDetectorService {
+public class ConnectionDetector {
 
     private static Context context;
-    private static ConnectionDetectorService internetDetector;
+    private static ConnectionDetector internetDetector;
 
-    private ConnectionDetectorService(Context newContext) {
+    private ConnectionDetector(Context newContext) {
         context = newContext;
     }
 
-    public static ConnectionDetectorService getConnectionDetector(Context newContext){
+    public static ConnectionDetector getConnectionDetector(Context newContext){
         if(internetDetector == null)
-            internetDetector = new ConnectionDetectorService(newContext);
+            internetDetector = new ConnectionDetector(newContext);
         else
             context = newContext;
         return internetDetector;

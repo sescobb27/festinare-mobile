@@ -1,4 +1,4 @@
-package com.festinare.discount.services.httpService;
+package com.festinare.discount.tools.http;
 
 import java.util.Map;
 

@@ -1,11 +1,11 @@
-package com.festinare.discount.services.sessionService;
+package com.festinare.discount.tools;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-public class SessionService {
+public class SessionHelper {
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -16,7 +16,7 @@ public class SessionService {
     private static final String APP_NAME = "FestinareDiscount";
     private static final String APP_VERSION = "FestinareDiscount::Version";
 
-    public SessionService(Context context) {
+    public SessionHelper(Context context) {
         this.context = context;
     }
 

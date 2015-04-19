@@ -1,4 +1,4 @@
-package com.festinare.discount.auth;
+package com.festinare.discount.ui;
 
 import com.google.gson.Gson;
 
@@ -11,11 +11,11 @@ import org.json.JSONObject;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -24,17 +24,16 @@ import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 
-import com.festinare.discount.ui.MainActivity;
 import com.festinare.discount.models.User;
 import com.festinare.discount.R;
-import com.festinare.discount.services.connectionDetectorService.ConnectionDetectorService;
-import com.festinare.discount.services.httpService.AuthService;
-import com.festinare.discount.services.sessionService.SessionService;
+import com.festinare.discount.tools.ConnectionDetector;
+import com.festinare.discount.tools.http.AuthHelper;
+import com.festinare.discount.tools.SessionHelper;
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends Activity implements OnClickListener {
+public class LoginActivity extends ActionBarActivity implements OnClickListener {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
@@ -43,7 +42,7 @@ public class LoginActivity extends Activity implements OnClickListener {
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-    private AuthService auth;
+    private AuthHelper auth;
     private User user;
 
     @Override
@@ -55,11 +54,11 @@ public class LoginActivity extends Activity implements OnClickListener {
         // If this check succeeds, proceed with normal processing.
         // Otherwise, prompt user to get valid Play Services APK.
         if (checkPlayServices()) {
-            ConnectionDetectorService connDetector = ConnectionDetectorService.getConnectionDetector(getApplicationContext());
+            ConnectionDetector connDetector = ConnectionDetector.getConnectionDetector(getApplicationContext());
             if (connDetector.isConnectedToInternet()) {
-                auth = new AuthService();
-                SessionService sessionService = new SessionService(getApplicationContext());
-                String token = sessionService.getAPIToken();
+                auth = new AuthHelper();
+                SessionHelper sessionHelper = new SessionHelper(getApplicationContext());
+                String token = sessionHelper.getAPIToken();
                 if (!token.isEmpty()) {
                     loginByToken(token);
                 } else {

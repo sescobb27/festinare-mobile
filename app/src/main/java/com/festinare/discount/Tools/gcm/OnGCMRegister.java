@@ -1,4 +1,4 @@
-package com.festinare.discount.services.gcmService;
+package com.festinare.discount.tools.gcm;
 
 import com.festinare.discount.models.Mobile;
 

@@ -1,4 +1,4 @@
-package com.festinare.discount.services.gcmService;
+package com.festinare.discount.tools.gcm;
 
 public class GcmBroadcastReceiver extends android.support.v4.content.WakefulBroadcastReceiver
 {

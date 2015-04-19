@@ -1,4 +1,4 @@
-package com.festinare.discount.services.gcmService;
+package com.festinare.discount.tools.gcm;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -10,23 +10,23 @@ import android.util.Log;
 import java.io.IOException;
 
 import com.festinare.discount.models.Mobile;
-import com.festinare.discount.services.sessionService.SessionService;
+import com.festinare.discount.tools.SessionHelper;
 
-public class GCMRegistrationService {
+public class GCMRegistrationHelper {
 
     private GoogleCloudMessaging gcm;
     private Context context;
     private String gcmId;
-    private SessionService mSessionService;
+    private SessionHelper mSessionHelper;
     private OnGCMRegister interestedInRegistration;
     private boolean updateGCMKey = false;
 
     private final String SENDER_ID = "";
     private final String TAG = "GCM::SERVICE";
 
-    public GCMRegistrationService(Context context, OnGCMRegister interestedInRegistration) {
+    public GCMRegistrationHelper(Context context, OnGCMRegister interestedInRegistration) {
         this.context = context;
-        this.mSessionService = new SessionService(context);
+        this.mSessionHelper = new SessionHelper(context);
         this.interestedInRegistration = interestedInRegistration;
     }
 
@@ -59,7 +59,7 @@ public class GCMRegistrationService {
      *         registration ID.
      */
     private String getRegistrationId() throws PackageManager.NameNotFoundException {
-        String registrationId = mSessionService.getGCMKey();
+        String registrationId = mSessionHelper.getGCMKey();
         if (registrationId.isEmpty()) {
             Log.i(TAG, "Registration not found.");
             return "";
@@ -67,8 +67,8 @@ public class GCMRegistrationService {
         // Check if app was updated; if so, it must clear the registration ID
         // since the existing registration ID is not guaranteed to work with
         // the new app version.
-        int registeredVersion = mSessionService.getRegisteredAppVersion();
-        int currentVersion = mSessionService.getAppVersion();
+        int registeredVersion = mSessionHelper.getRegisteredAppVersion();
+        int currentVersion = mSessionHelper.getAppVersion();
         if (registeredVersion != currentVersion) {
             Log.i(TAG, "App version changed.");
             return "";
@@ -89,8 +89,8 @@ public class GCMRegistrationService {
                 try {
                     gcmId = gcm.register(SENDER_ID);
                     // Persist the regID - no need to register again.
-                    mSessionService.setGCMKey(gcmId);
-                    Log.i(TAG, "Saving regId on app version " + mSessionService.getRegisteredAppVersion());
+                    mSessionHelper.setGCMKey(gcmId);
+                    Log.i(TAG, "Saving regId on app version " + mSessionHelper.getRegisteredAppVersion());
                 } catch (IOException ex) {
                     // TODO
                     ex.printStackTrace();

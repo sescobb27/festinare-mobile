@@ -18,14 +18,14 @@ import java.io.UnsupportedEncodingException;
 import com.festinare.discount.models.Mobile;
 import com.festinare.discount.models.User;
 import com.festinare.discount.R;
-import com.festinare.discount.services.gcmService.GCMRegistrationService;
-import com.festinare.discount.services.gcmService.OnGCMRegister;
-import com.festinare.discount.services.httpService.UserService;
+import com.festinare.discount.tools.gcm.GCMRegistrationHelper;
+import com.festinare.discount.tools.gcm.OnGCMRegister;
+import com.festinare.discount.tools.http.UserHelper;
 
 public class MainActivity extends ActionBarActivity implements OnGCMRegister {
 
 
-    private GCMRegistrationService gcmRegistrationService;
+    private GCMRegistrationHelper gcmRegistrationHelper;
     private User user;
 
     @Override
@@ -35,8 +35,8 @@ public class MainActivity extends ActionBarActivity implements OnGCMRegister {
 
         user = (User) getIntent().getSerializableExtra("user");
 
-        gcmRegistrationService = new GCMRegistrationService(getApplicationContext(), this);
-        gcmRegistrationService.getGcmRegistrationIdOrRegister();
+        gcmRegistrationHelper = new GCMRegistrationHelper(getApplicationContext(), this);
+        gcmRegistrationHelper.getGcmRegistrationIdOrRegister();
     }
 
     @Override
@@ -63,10 +63,10 @@ public class MainActivity extends ActionBarActivity implements OnGCMRegister {
 
     @Override
     public void onGCMRegister(Mobile mobile) {
-        if ( gcmRegistrationService.needsGCMKeyUpdate() ) {
-            UserService userService = new UserService();
+        if ( gcmRegistrationHelper.needsGCMKeyUpdate() ) {
+            UserHelper userHelper = new UserHelper();
             try {
-                userService.mobile(getApplicationContext(), user, mobile, new JsonHttpResponseHandler(
+                userHelper.mobile(getApplicationContext(), user, mobile, new JsonHttpResponseHandler(
                         HTTP.UTF_8) {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {

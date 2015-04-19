@@ -1,4 +1,4 @@
-package com.festinare.discount.services.httpService;
+package com.festinare.discount.tools.http;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -15,15 +15,15 @@ import android.content.Context;
 
 import java.io.UnsupportedEncodingException;
 
-import com.festinare.discount.services.sessionService.SessionService;
+import com.festinare.discount.tools.SessionHelper;
 
-public class AuthService extends JsonHttpResponseHandler {
+public class AuthHelper extends JsonHttpResponseHandler {
 
     private AsyncHttpClient client;
     private AsyncHttpResponseHandler callback;
     private Context callbackContext;
 
-    public AuthService() {
+    public AuthHelper() {
         super(HTTP.UTF_8);
         client = new AsyncHttpClient();
         client.addHeader(AsyncHttpClient.HEADER_ACCEPT_ENCODING, AsyncHttpClient.ENCODING_GZIP);
@@ -67,7 +67,7 @@ public class AuthService extends JsonHttpResponseHandler {
 //            response contains the authorization token
             try {
                 String token = response.getString("token");
-                SessionService session = new SessionService(callbackContext);
+                SessionHelper session = new SessionHelper(callbackContext);
                 session.setAPIToken(token);
                 me(callbackContext, token, callback);
             } catch (JSONException e) {

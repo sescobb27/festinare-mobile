@@ -1,4 +1,4 @@
-package com.festinare.discount.services.httpService;
+package com.festinare.discount.tools.http;
 
 import com.google.gson.Gson;
 
@@ -19,11 +19,11 @@ import java.util.Map;
 import com.festinare.discount.models.Mobile;
 import com.festinare.discount.models.User;
 
-public class UserService {
+public class UserHelper {
 
     private AsyncHttpClient client;
 
-    public UserService() {
+    public UserHelper() {
         client = new AsyncHttpClient();
         client.addHeader(AsyncHttpClient.HEADER_ACCEPT_ENCODING, AsyncHttpClient.ENCODING_GZIP);
     }

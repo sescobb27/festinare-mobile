@@ -1,4 +1,4 @@
-package com.festinare.discount.services.gcmService;
+package com.festinare.discount.tools.gcm;
 import android.app.IntentService;
 
 public class GcmIntentService extends IntentService

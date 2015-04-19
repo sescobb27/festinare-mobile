@@ -1,5 +1,6 @@
-package com.festinare.discount.auth;
+package com.festinare.discount.ui;
 
+import com.festinare.discount.tools.ProfileQuery;
 import com.google.gson.Gson;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -8,7 +9,6 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -17,6 +17,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,14 +31,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.festinare.discount.ui.MainActivity;
 import com.festinare.discount.models.User;
 import com.festinare.discount.R;
-import com.festinare.discount.services.connectionDetectorService.ConnectionDetectorService;
-import com.festinare.discount.services.httpService.AuthService;
+import com.festinare.discount.tools.ConnectionDetector;
+import com.festinare.discount.tools.http.AuthHelper;
 
 
-public class RegisterActivity extends Activity implements
+public class RegisterActivity extends ActionBarActivity implements
         LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -49,7 +49,7 @@ public class RegisterActivity extends Activity implements
     private View progressView;
     private View registerFormView;
     private Button registerButton;
-    private AuthService auth;
+    private AuthHelper auth;
     private User user;
 
     @Override
@@ -59,7 +59,7 @@ public class RegisterActivity extends Activity implements
         // If this check succeeds, proceed with normal processing.
         // Otherwise, prompt user to get valid Play Services APK.
         if (checkPlayServices()) {
-            ConnectionDetectorService connDetector = ConnectionDetectorService
+            ConnectionDetector connDetector = ConnectionDetector
                     .getConnectionDetector(getApplicationContext());
             if (connDetector.isConnectedToInternet()) {
                 setup();
@@ -83,7 +83,7 @@ public class RegisterActivity extends Activity implements
         registerButton = (Button) findViewById(R.id.register_button);
         registerButton.setOnClickListener(this);
 
-        auth = new AuthService();
+        auth = new AuthHelper();
     }
 
     // You need to do the Play Services APK check here too.

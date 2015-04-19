@@ -1,4 +1,4 @@
-package com.festinare.discount.auth;
+package com.festinare.discount.tools;
 
 import android.provider.ContactsContract;
 

@@ -6,7 +6,7 @@ import android.support.v7.app.*;
 import android.view.*;
 import java.util.*;
 
-import com.festinare.discount.auth.LoginActivity;
+import com.festinare.discount.ui.LoginActivity;
 
 
 public class IndexActivity extends ActionBarActivity
@@ -29,7 +29,7 @@ public class IndexActivity extends ActionBarActivity
         };
 
         Timer timerOnTask = new Timer();
-        timerOnTask.schedule(task, 5000);
+        timerOnTask.schedule(task, 2000);
     }
 
 
