@@ -1,6 +1,8 @@
 package com.festinare.discount.ui;
 
 import com.festinare.discount.tools.ProfileQuery;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.gson.Gson;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -18,6 +20,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,13 +67,14 @@ public class RegisterActivity extends ActionBarActivity implements
             if (connDetector.isConnectedToInternet()) {
                 setup();
             } else {
-                android.util.Log
-                        .i("FestinareDiscount", "Activa los datos o conectate al wifi mas cercano");
+                Log.i("FestinareDiscount", "Activa los datos o conectate al wifi mas cercano");
                 Toast.makeText(getApplicationContext(),
                         "Activa los datos o conectate al wifi mas cercano",
                         Toast.LENGTH_LONG).show();
                 finish();
             }
+        }else{
+            Log.e("GCM", "No se ha encontrado Google Play Services.");
         }
     }
 
@@ -99,16 +103,15 @@ public class RegisterActivity extends ActionBarActivity implements
      * the Google Play Store or enable it in the device's system settings.
      */
     private boolean checkPlayServices() {
-        int resultCode = com.google.android.gms.common.GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(this);
-        if (resultCode != com.google.android.gms.common.ConnectionResult.SUCCESS) {
-            if (com.google.android.gms.common.GooglePlayServicesUtil
-                    .isUserRecoverableError(resultCode)) {
-                com.google.android.gms.common.GooglePlayServicesUtil
-                        .getErrorDialog(resultCode, this,
-                                PLAY_SERVICES_RESOLUTION_REQUEST).show();
+
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
-                android.util.Log.i("FestinareDiscount", "This device is not supported.");
+                Log.e("FestinareDiscount", "This device is not supported.");
                 finish();
             }
             return false;
@@ -146,7 +149,7 @@ public class RegisterActivity extends ActionBarActivity implements
         String password = passwordView.getText().toString();
         String passwordConfirmation = passwordConfirmationView.getText().toString();
         return !password.isEmpty() &&
-                password.length() >= 8 &&
+                password.length() >= 1 &&
                 !passwordConfirmation.isEmpty() &&
                 password.equals(passwordConfirmation);
     }
@@ -190,6 +193,7 @@ public class RegisterActivity extends ActionBarActivity implements
                                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                                     super.onFailure(statusCode, headers, throwable, errorResponse);
                                     // TODO
+
                                 }
                             });
                     } catch (JSONException e) {

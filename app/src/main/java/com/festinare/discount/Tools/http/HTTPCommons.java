@@ -5,9 +5,10 @@ import java.util.Map;
 import com.festinare.discount.tools.StrSubstitutor;
 
 public final class HTTPCommons {
-    public static final String HOST_URL = "http://192.168.1.20:3000";        // development machine ip
-//    public static final String HOST_URL = "http://10.0.2.2:3000";         // AVD ip to route to host machine
-//    public static final String HOST_URL = "http://api.festinare.co:3000";  // 'production' server
+    public static final String HOST_URL = "http://192.168.1.20:3000/api";        // development machine ip
+//    public static final String HOST_URL = "http://192.168.1.20:3000/api";
+//    public static final String HOST_URL = "http://10.0.2.2:3000/api";         // AVD ip to route to host machine
+//    public static final String HOST_URL = "http://api.festinare.co:3000/api";  // 'production' server
 //    POST     /v1/users/login
     public static final String LOGIN_URL = HOST_URL + "/v1/users/login";
 //    POST     /v1/users

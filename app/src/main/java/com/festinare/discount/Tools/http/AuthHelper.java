@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
 
@@ -71,14 +72,14 @@ public class AuthHelper extends JsonHttpResponseHandler {
                 session.setAPIToken(token);
                 me(callbackContext, token, callback);
             } catch (JSONException e) {
-                android.util.Log.e(AsyncHttpClient.LOG_TAG, e.toString());
+                Log.e(AsyncHttpClient.LOG_TAG, e.toString());
             }
         }
     }
 
     @Override
     public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
-        android.util.Log.e(AsyncHttpClient.LOG_TAG, error.getMessage());
+        Log.e(AsyncHttpClient.LOG_TAG, error.getMessage());
     }
 }
 

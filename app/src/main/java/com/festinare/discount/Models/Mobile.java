@@ -7,9 +7,9 @@ public class Mobile {
     @SerializedName("_id")
     private String id;
     private String token; // GCM_ID
-    private final static String platform = "android";
+    private String platform = "android";
 
-    public Mobile() { }
+    public Mobile() {}
 
     public String getToken() {
         return token;
@@ -19,7 +19,7 @@ public class Mobile {
         this.token = token;
     }
 
-    public static String getPlatform() {
+    public String getPlatform() {
         return platform;
     }
 
