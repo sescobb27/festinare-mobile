@@ -1,6 +1,5 @@
 package com.festinare.discount.ui;
 
-import com.festinare.discount.tools.ProfileQuery;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.gson.Gson;
@@ -11,28 +10,21 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.LoaderManager;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.festinare.discount.models.User;
 import com.festinare.discount.R;
@@ -40,25 +32,23 @@ import com.festinare.discount.tools.ConnectionDetector;
 import com.festinare.discount.tools.http.AuthHelper;
 
 
-public class RegisterActivity extends ActionBarActivity implements
-        LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
+public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
-    private AutoCompleteTextView emailView;
-    private EditText usernameView;
-    private EditText passwordView;
-    private EditText passwordConfirmationView;
-    private View progressView;
-    private View registerFormView;
-    private Button registerButton;
+    private EditText etxtEmail;
+    private EditText etxtUsername;
+    private EditText etxtPassword;
+    private EditText etxtPasswordConfirmation;
+    private Button btnRegister;
+    private ProgressBar pbRegister;
     private AuthHelper auth;
     private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.register_activity);
+        setContentView(R.layout.activity_register);
         // If this check succeeds, proceed with normal processing.
         // Otherwise, prompt user to get valid Play Services APK.
         if (checkPlayServices()) {
@@ -67,25 +57,20 @@ public class RegisterActivity extends ActionBarActivity implements
             if (connDetector.isConnectedToInternet()) {
                 setup();
             } else {
-                Log.i("FestinareDiscount", "Activa los datos o conectate al wifi mas cercano");
-                Toast.makeText(getApplicationContext(),
-                        "Activa los datos o conectate al wifi mas cercano",
-                        Toast.LENGTH_LONG).show();
+                Log.i("FestinareDiscount", "No internet Connection");
                 finish();
             }
-        }else{
-            Log.e("GCM", "No se ha encontrado Google Play Services.");
         }
     }
 
     private void setup() {
-        emailView = (AutoCompleteTextView) findViewById(R.id.register_email);
-        populateAutoComplete();
-        usernameView = (EditText) findViewById(R.id.register_username);
-        passwordView = (EditText) findViewById(R.id.register_password);
-        passwordConfirmationView = (EditText) findViewById((R.id.register_password_confirmation));
-        registerButton = (Button) findViewById(R.id.register_button);
-        registerButton.setOnClickListener(this);
+        etxtEmail = (EditText) findViewById(R.id.etxtEmailRegister);
+        etxtUsername = (EditText) findViewById(R.id.etxtUsernameRegister);
+        etxtPassword = (EditText) findViewById(R.id.etxtPasswordRegister);
+        etxtPasswordConfirmation = (EditText) findViewById((R.id.etxtPasswordConfirmationRegister));
+        pbRegister = (ProgressBar) findViewById(R.id.pbRegister);
+        btnRegister = (Button) findViewById(R.id.btnRegister);
+        btnRegister.setOnClickListener(this);
 
         auth = new AuthHelper();
     }
@@ -111,7 +96,7 @@ public class RegisterActivity extends ActionBarActivity implements
                 GooglePlayServicesUtil.getErrorDialog(resultCode, this,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
-                Log.e("FestinareDiscount", "This device is not supported.");
+                Log.e("FestinareDiscount", "There is not Google Play Services, This device is not supported.");
                 finish();
             }
             return false;
@@ -141,114 +126,131 @@ public class RegisterActivity extends ActionBarActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    private void populateAutoComplete() {
-        getLoaderManager().initLoader(0, null, this);
+    private boolean isValidPassword(String password) {
+
+        String passwordConfirmation = etxtPasswordConfirmation.getText().toString().trim();
+
+        if (password.length() < 8 ) {
+            Toast.makeText(getApplicationContext(), getString(R.string.error_invalid_password_length), Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if(passwordConfirmation.isEmpty() || !password.equals(passwordConfirmation)) {
+            Toast.makeText(getApplicationContext(), getString(R.string.error_invalid_password_confirmation), Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
     }
 
-    private boolean isValidPassword() {
-        String password = passwordView.getText().toString();
-        String passwordConfirmation = passwordConfirmationView.getText().toString();
-        return !password.isEmpty() &&
-                password.length() >= 1 &&
-                !passwordConfirmation.isEmpty() &&
-                password.equals(passwordConfirmation);
+    /**
+     * Verifies that the email is well written
+     */
+    public boolean isEmail(String email) {
+        if (!email.isEmpty()) {
+            Pattern pat;
+            Matcher mat;
+            pat = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" +
+                    "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,3})$");
+            mat = pat.matcher(email);
+            if (mat.find()) {
+                return true;
+            } else {
+                Toast.makeText(getApplicationContext(), getString(R.string.error_invalid_email), Toast.LENGTH_LONG).show();
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
-    @Override
+    public boolean isFieldsEmpty(String email, String username, String password) {
+
+        if (!email.isEmpty() && !username.isEmpty() && !password.isEmpty()){
+            return true;
+        }else{
+            Toast.makeText(getApplicationContext(), getString(R.string.error_blankSpace_all), Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+    }
+
+    public void register() {
+
+        String email = etxtEmail.getText().toString().trim();
+        String username = etxtUsername.getText().toString().trim();
+        String password = etxtPassword.getText().toString().trim();
+
+        if (isFieldsEmpty(email, username, password) && isEmail(email) && isValidPassword(password)) {
+            setButtonState(false);
+            try {
+                auth.register(
+                        getApplicationContext(),
+                        email,
+                        username,
+                        password,
+                        new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                Gson gson = new Gson();
+                                Log.i("REGISTER USER: ", response.toString());
+                                try {
+                                    JSONObject tmp = response.getJSONObject("user");
+                                    user = gson.fromJson(tmp.toString(), User.class);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                            intent.putExtra("user", user);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    });
+                                } catch (JSONException e) {
+
+                                    e.printStackTrace();
+                                    Toast.makeText(getApplicationContext(), getString(R.string.error_register), Toast.LENGTH_LONG).show();
+                                    setButtonState(true);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                super.onFailure(statusCode, headers, throwable, errorResponse);
+
+                                Toast.makeText(getApplicationContext(), getString(R.string.error_register), Toast.LENGTH_LONG).show();
+                                setButtonState(true);
+                            }
+                        });
+            } catch (JSONException | UnsupportedEncodingException e) {
+
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), getString(R.string.error_register), Toast.LENGTH_LONG).show();
+                setButtonState(true);
+            }
+        }
+    }
+
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.register_button:
-                if (isValidPassword()) {
-                    try {
-                        auth.register(
-                            getApplicationContext(),
-                            emailView.getText().toString(),
-                            usernameView.getText().toString(),
-                            passwordView.getText().toString(),
-                            new JsonHttpResponseHandler() {
-                                @Override
-                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                    Gson gson = new Gson();
-                                    android.util.Log.i("REGISTER USER: ", response.toString());
-                                    try {
-                                        JSONObject tmp = response.getJSONObject("user");
-                                        user = gson.fromJson(tmp.toString(), User.class);
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Intent
-                                                        intent = new Intent(RegisterActivity.this, MainActivity.class);
-                                                intent.putExtra("user", user);
-                                                startActivity(intent);
-                                                finish();
-                                            }
-                                        });
-                                    } catch (JSONException e) {
-                                        // TODO
-                                        e.printStackTrace();
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                                    // TODO
-
-                                }
-                            });
-                    } catch (JSONException e) {
-                        // TODO
-                        e.printStackTrace();
-                    } catch (UnsupportedEncodingException e) {
-                        // TODO
-                        e.printStackTrace();
-                    }
+            case R.id.btnRegister:
+                ConnectionDetector connDetector = ConnectionDetector.getConnectionDetector(getApplicationContext());
+                if (connDetector.isConnectedToInternet()) {
+                    register();
+                }else {
+                    Log.i("FestinareDiscount", "No internet Connection");
                 }
                 break;
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
+    public void setButtonState(boolean enabled) {
 
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        List<String> emails = new ArrayList<String>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
+        if(enabled){
+            pbRegister.setVisibility(View.GONE);
+            btnRegister.setVisibility(View.VISIBLE);
+        }else{
+            pbRegister.setVisibility(View.VISIBLE);
+            btnRegister.setVisibility(View.GONE);
         }
-
-        addEmailsToAutoComplete(emails);
     }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<String>(RegisterActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        emailView.setAdapter(adapter);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-
 }

@@ -2,7 +2,9 @@ package com.festinare.discount.models;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Mobile {
+import java.io.Serializable;
+
+public class Mobile implements Serializable {
 
     @SerializedName("_id")
     private String id;

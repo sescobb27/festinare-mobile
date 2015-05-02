@@ -64,6 +64,7 @@ public class AuthHelper extends JsonHttpResponseHandler {
 
     @Override
     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
         if (statusCode == HttpStatus.SC_OK) {
 //            response contains the authorization token
             try {
@@ -78,8 +79,18 @@ public class AuthHelper extends JsonHttpResponseHandler {
     }
 
     @Override
-    public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
-        Log.e(AsyncHttpClient.LOG_TAG, error.getMessage());
+    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+        super.onFailure(statusCode, headers, throwable, errorResponse);
+        Log.e(AsyncHttpClient.LOG_TAG, Integer.toString(statusCode)+ " " +throwable.getMessage());
+        callback.sendFailureMessage(statusCode, headers, null, throwable);
     }
+
+    @Override
+    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+        super.onFailure(statusCode, headers, responseString, throwable);
+        Log.e(AsyncHttpClient.LOG_TAG, Integer.toString(statusCode)+ " " +throwable.getMessage());
+        callback.sendFailureMessage(statusCode, headers, null, throwable);
+    }
+
 }
 

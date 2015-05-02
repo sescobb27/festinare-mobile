@@ -13,7 +13,7 @@ public class StrSubstitutor {
     }
 
     public String replace(String str) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         char[] strArray = str.toCharArray();
         int i = 0;
         while (i < strArray.length - 1) {

@@ -1,15 +1,19 @@
 package com.festinare.discount;
 
-import android.content.*;
-import android.os.*;
-import android.support.v7.app.*;
-import android.view.*;
-import java.util.*;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.festinare.discount.ui.LoginActivity;
 
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class IndexActivity extends ActionBarActivity
+
+public class IndexActivity extends AppCompatActivity
 {
 
     @Override
@@ -29,7 +33,7 @@ public class IndexActivity extends ActionBarActivity
         };
 
         Timer timerOnTask = new Timer();
-        timerOnTask.schedule(task, 2000);
+        timerOnTask.schedule(task, 500);
     }
 
 

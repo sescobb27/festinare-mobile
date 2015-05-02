@@ -1,12 +1,17 @@
 package com.festinare.discount.tools.gcm;
 
+import com.festinare.discount.R;
 import com.festinare.discount.models.User;
+import com.festinare.discount.tools.ConnectionDetector;
 import com.festinare.discount.tools.http.UserHelper;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import java.io.IOException;
@@ -17,13 +22,10 @@ import java.util.Locale;
 
 import com.festinare.discount.models.Mobile;
 import com.festinare.discount.tools.SessionHelper;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.apache.http.Header;
-import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class GCMRegistrationHelper {
 
@@ -44,7 +46,7 @@ public class GCMRegistrationHelper {
         this.mSessionHelper = new SessionHelper(context);
     }
 
-    public void getGcmRegistrationIdOrRegister() {
+    public void registerGCM() {
         gcm = GoogleCloudMessaging.getInstance(context);
 
         try {
@@ -56,7 +58,12 @@ public class GCMRegistrationHelper {
 
         if (gcmId.isEmpty()) {
             updateGCMKey = true;
-            registerInBackground();
+            ConnectionDetector connDetector = ConnectionDetector.getConnectionDetector(context.getApplicationContext());
+            if (connDetector.isConnectedToInternet()) {
+                registerInBackground();
+            }else{
+                showMessage(R.string.error_gcm_registration_title,R.string.error_gcm_registration_msg_connection);
+            }
         }
     }
 
@@ -69,23 +76,6 @@ public class GCMRegistrationHelper {
      *         registration ID.
      */
     private String getRegistrationId() throws PackageManager.NameNotFoundException {
-//        String registrationId = mSessionHelper.getGCMKey();
-//        if (registrationId.isEmpty()) {
-//            Log.i(TAG, "Registration not found.");
-//            return "";
-//        }
-//        // Check if app was updated; if so, it must clear the registration ID
-//        // since the existing registration ID is not guaranteed to work with
-//        // the new app version.
-//        int registeredVersion = mSessionHelper.getRegisteredAppVersion();
-//        int currentVersion = mSessionHelper.getAppVersion();
-//        if (registeredVersion != currentVersion) {
-//            Log.i(TAG, "App version changed.");
-//            return "";
-//        }
-//        return registrationId;
-
-
 
         String registrationId = mSessionHelper.getGCMKey();
 
@@ -135,18 +125,15 @@ public class GCMRegistrationHelper {
                     gcmId = gcm.register(SENDER_ID);
 
                 } catch (IOException ex) {
-                    // TODO
                     ex.printStackTrace();
-                    // If there is an error, don't just keep trying to register.
-                    // Require the user to click a button again, or perform
-                    // exponential back-off.
+                    showMessage(R.string.error_gcm_registration_title, R.string.error_gcm_registration_msg);
                 }
                 return gcmId;
             }
 
             @Override
             protected void onPostExecute(String gcmId) {
-                    Log.i(TAG, "Saving regId on app version " + mSessionHelper.getRegisteredAppVersion());
+                    Log.i(TAG, "onPost " + gcmId);
                     Mobile mobile = new Mobile();
                     mobile.setToken(gcmId);
                     onGCMRegister(mobile);
@@ -158,34 +145,53 @@ public class GCMRegistrationHelper {
         if (updateGCMKey) {
             UserHelper userHelper = new UserHelper();
             try {
-                userHelper.mobile(context, user, mobile, new JsonHttpResponseHandler(
-                        HTTP.UTF_8) {
+                userHelper.mobile(context, user, mobile, new AsyncHttpResponseHandler() {
                     @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
+                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         // Persist the regID - no need to register again.
                         try {
                             mSessionHelper.setGCMKey(gcmId);
                         } catch (PackageManager.NameNotFoundException e) {
-                            //TODO
                             e.printStackTrace();
+                            showMessage(R.string.error_gcm_registration_title, R.string.error_gcm_registration_msg);
                         }
                     }
 
                     @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
-                        // TODO
-                        Log.e(AsyncHttpClient.LOG_TAG, error.getMessage());
+                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                        Log.e(TAG, "", error);
+                        showMessage(R.string.error_gcm_registration_title, R.string.error_gcm_registration_msg);
                     }
+
                 });
-            } catch (JSONException e) {
-                // TODO
-                e.printStackTrace();
-            } catch (UnsupportedEncodingException e) {
-                // TODO
+            } catch (JSONException | UnsupportedEncodingException e) {
+                showMessage(R.string.error_gcm_registration_title,R.string.error_gcm_registration_msg);
                 e.printStackTrace();
             }
         }
+    }
+
+    /**Show simple messages to the user*/
+    public void showMessage(int title, int msg){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(title);
+        builder.setMessage(msg);
+        builder.setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                ConnectionDetector connDetector = ConnectionDetector.getConnectionDetector(context.getApplicationContext());
+                if (connDetector.isConnectedToInternet()) {
+                    registerInBackground();
+                }else{
+                    showMessage(R.string.error_gcm_registration_title,R.string.error_gcm_registration_msg_connection);
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                ((AppCompatActivity)context).finish();
+            }
+        });
+        builder.show();
     }
 
 }

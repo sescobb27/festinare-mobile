@@ -12,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -33,9 +32,8 @@ public class UserHelper {
     public void mobile (Context context, User user, Mobile mobile, AsyncHttpResponseHandler responseHandler)
             throws JSONException, UnsupportedEncodingException {
         Gson gson = new Gson();
-        String mobileJsonContent = gson.toJson(mobile);
         JSONObject mobileJson = new JSONObject();
-        mobileJson.put("mobile",mobileJsonContent);
+        mobileJson.put("mobile",new JSONObject(gson.toJson(mobile)));
         JSONObject userJson = new JSONObject();
         userJson.put("user", mobileJson);
 

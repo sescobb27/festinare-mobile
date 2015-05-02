@@ -1,7 +1,7 @@
 package com.festinare.discount.ui;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -9,7 +9,7 @@ import com.festinare.discount.R;
 import com.festinare.discount.models.User;
 import com.festinare.discount.tools.gcm.GCMRegistrationHelper;
 
-public class MainActivity extends ActionBarActivity{
+public class MainActivity extends AppCompatActivity{
 
 
     private GCMRegistrationHelper gcmRegistrationHelper;
@@ -19,9 +19,9 @@ public class MainActivity extends ActionBarActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        gcmRegistrationHelper = new GCMRegistrationHelper(getApplicationContext(),
+        gcmRegistrationHelper = new GCMRegistrationHelper(MainActivity.this,
                 (User) getIntent().getSerializableExtra("user"));
-        gcmRegistrationHelper.getGcmRegistrationIdOrRegister();
+        gcmRegistrationHelper.registerGCM();
     }
 
     @Override
