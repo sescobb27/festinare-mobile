@@ -1,7 +1,6 @@
 package com.festinare.discount.ui;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.festinare.discount.tools.SessionHelper;
 import com.google.gson.Gson;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -34,8 +33,6 @@ import com.festinare.discount.tools.http.AuthHelper;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
     private EditText etxtEmail;
     private EditText etxtUsername;
     private EditText etxtPassword;
@@ -43,24 +40,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private Button btnRegister;
     private ProgressBar pbRegister;
     private AuthHelper auth;
-    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        // If this check succeeds, proceed with normal processing.
-        // Otherwise, prompt user to get valid Play Services APK.
-        if (checkPlayServices()) {
-            ConnectionDetector connDetector = ConnectionDetector
-                    .getConnectionDetector(getApplicationContext());
-            if (connDetector.isConnectedToInternet()) {
-                setup();
-            } else {
-                Log.i("FestinareDiscount", "No internet Connection");
-                finish();
-            }
-        }
+
+        setup();
     }
 
     private void setup() {
@@ -79,29 +65,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onResume() {
         super.onResume();
-        checkPlayServices();
-    }
-
-    /**
-     * Check the device to make sure it has the Google Play Services APK. If
-     * it doesn't, display a dialog that allows users to download the APK from
-     * the Google Play Store or enable it in the device's system settings.
-     */
-    private boolean checkPlayServices() {
-
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.e("FestinareDiscount", "There is not Google Play Services, This device is not supported.");
-                finish();
-            }
-            return false;
-        }
-        return true;
     }
 
     @Override
@@ -195,12 +158,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                 Log.i("REGISTER USER: ", response.toString());
                                 try {
                                     JSONObject tmp = response.getJSONObject("user");
-                                    user = gson.fromJson(tmp.toString(), User.class);
+                                    gson.fromJson(tmp.toString(), User.class);
+                                    SessionHelper sessionHelper = new SessionHelper(getApplicationContext());
+                                    sessionHelper.setUser(tmp.toString());
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
                                             Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                                            intent.putExtra("user", user);
                                             startActivity(intent);
                                             finish();
                                         }

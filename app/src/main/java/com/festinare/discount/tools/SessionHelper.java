@@ -17,14 +17,14 @@ public class SessionHelper {
     private static final String EXPIRATION_TIME = "GCM::ExpirationTime";
     private static final String APP_NAME = "FestinareDiscount";
     private static final String APP_VERSION = "FestinareDiscount::Version";
+    private static final String USER = "FestinareDiscount::User";
 
 
     public SessionHelper(Context context) {
         this.context = context;
     }
 
-    private SharedPreferences getSharedFromContext()
-    {
+    private SharedPreferences getSharedFromContext(){
         return context.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE);
     }
 
@@ -45,6 +45,18 @@ public class SessionHelper {
     public String getAPIToken() {
         sharedPreferences = getSharedFromContext();
         return sharedPreferences.getString(API_TOKEN, "");
+    }
+
+    public void setUser(String user){
+        sharedPreferences = getSharedFromContext();
+        editor = sharedPreferences.edit();
+        editor.putString(USER, user);
+        editor.apply();
+    }
+
+    public String getUser() {
+        sharedPreferences = getSharedFromContext();
+        return sharedPreferences.getString(USER, "");
     }
 
     public void setAPIToken(String token) {
@@ -70,6 +82,13 @@ public class SessionHelper {
     public int getAppVersion() throws PackageManager.NameNotFoundException {
         PackageInfo packageInfo = this.context.getPackageManager().getPackageInfo(this.context.getPackageName(), 0);
         return packageInfo.versionCode;
+    }
+
+    public void logOut(){
+        sharedPreferences = getSharedFromContext();
+        editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
     }
 
 }

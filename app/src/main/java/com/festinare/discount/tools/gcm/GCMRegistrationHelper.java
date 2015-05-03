@@ -133,7 +133,6 @@ public class GCMRegistrationHelper {
 
             @Override
             protected void onPostExecute(String gcmId) {
-                    Log.i(TAG, "onPost " + gcmId);
                     Mobile mobile = new Mobile();
                     mobile.setToken(gcmId);
                     onGCMRegister(mobile);
