@@ -1,0 +1,14 @@
+  [
+    {
+      "name": "Bar",
+      "description": "All kinds of bars"
+    },
+    {
+      "name": "Disco",
+      "description": "All kinds of discos"
+    },
+    {
+      "name": "Restaurant",
+      "description": "All kinds of restaurants"
+    }
+  ]

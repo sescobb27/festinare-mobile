@@ -22,6 +22,7 @@
     <string name="error_connection">Please connect to the network</string>
     <string name="error_blankSpace_all">You must enter all fields</string>
     <string name="error_login">Login Error, please try later</string>
+    <string name="error_invalid_login">Please log in again</string>
     <string name="error_register">Register Error, please try later</string>
     <string name="error_login_wrong_data">The username or password you entered is incorrect</string>
     <string name="error_gcm_registration_title">Google Cloud Messaging Error</string>
@@ -30,4 +31,7 @@
 
     <string name="retry">Retry</string>
     <string name="cancel">Cancel</string>
+    <string name="add">Add</string>
+    <string name="category_picker_title">Choose categories for the discounts</string>
+    <string name="no_category_selected">You didn\'t select a category. If you want to get discount go to preferences and choose a category</string>
 </resources>

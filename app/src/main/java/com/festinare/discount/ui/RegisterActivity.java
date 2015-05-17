@@ -61,12 +61,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         auth = new AuthHelper();
     }
 
-    // You need to do the Play Services APK check here too.
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

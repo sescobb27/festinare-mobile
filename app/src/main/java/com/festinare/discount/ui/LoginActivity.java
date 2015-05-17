@@ -64,12 +64,6 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
         auth = new AuthHelper();
     }
 
-    // You need to do the Play Services APK check here too.
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
     /**
      * Attempts to sign in or register the account specified by the login form.
      */
