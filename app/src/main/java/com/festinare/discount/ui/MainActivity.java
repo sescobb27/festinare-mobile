@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements CategoriesPickerF
 
         UserHelper userHelper = new UserHelper();
         try {
-            userHelper.categories(getApplicationContext(), user, categories, new AsyncHttpResponseHandler() {
+            userHelper.setCategories(getApplicationContext(), user, categories, new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                     user.setCategories(categories);

@@ -32,7 +32,7 @@ public class UserHelper {
         client.addHeader(AsyncHttpClient.HEADER_ACCEPT_ENCODING, AsyncHttpClient.ENCODING_GZIP);
     }
 
-    public void mobile (Context context, User user, Mobile mobile, AsyncHttpResponseHandler responseHandler)
+    public void setMobile(Context context, User user, Mobile mobile, AsyncHttpResponseHandler responseHandler)
             throws JSONException, UnsupportedEncodingException {
         Gson gson = new Gson();
         JSONObject mobileJson = new JSONObject();
@@ -49,7 +49,7 @@ public class UserHelper {
         client.put(context, url, null, entity, "application/json", responseHandler);
     }
 
-    public void categories (Context context, User user, List<Category> categories, AsyncHttpResponseHandler responseHandler)
+    public void setCategories(Context context, User user, List<Category> categories, AsyncHttpResponseHandler responseHandler)
             throws JSONException, UnsupportedEncodingException {
         Gson gson = new Gson();
         JSONObject categoriesJson = new JSONObject();
@@ -65,5 +65,4 @@ public class UserHelper {
         client.addHeader("Authorization", "Bearer " + session.getAPIToken());
         client.put(context, url, null, entity, "application/json", responseHandler);
     }
-
 }

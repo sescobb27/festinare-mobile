@@ -144,7 +144,7 @@ public class GCMRegistrationHelper {
         if (updateGCMKey) {
             UserHelper userHelper = new UserHelper();
             try {
-                userHelper.mobile(context, user, mobile, new AsyncHttpResponseHandler() {
+                userHelper.setMobile(context, user, mobile, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         // Persist the regID - no need to register again.
