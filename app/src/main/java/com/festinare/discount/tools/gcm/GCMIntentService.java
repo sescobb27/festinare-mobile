@@ -22,40 +22,40 @@ public class GCMIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent)
     {
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-
-        String messageType = gcm.getMessageType(intent);
-        Bundle extras = intent.getExtras();
-
-        if (!extras.isEmpty())
-        {
-            if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType))
-            {
-                showNotification(extras.getString("msg"));
-            }
-        }
-
-        GCMBroadcastReceiver.completeWakefulIntent(intent);
+//        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+//
+//        String messageType = gcm.getMessageType(intent);
+//        Bundle extras = intent.getExtras();
+//
+//        if (!extras.isEmpty())
+//        {
+//            if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType))
+//            {
+//                showNotification(extras.getString("msg"));
+//            }
+//        }
+//
+//        GCMBroadcastReceiver.completeWakefulIntent(intent);
     }
 
     private void showNotification(String msg)
     {
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(android.R.drawable.stat_sys_warning)
-                        .setContentTitle("New Discount")
-                        .setContentText(msg);
-
-        //TODO decide where to go: MainActivity or discount info activity
-        Intent notIntent =  new Intent(this, MainActivity.class);
-        PendingIntent contIntent = PendingIntent.getActivity(
-                this, 0, notIntent, 0);
-
-        mBuilder.setContentIntent(contIntent);
-
-        mNotificationManager.notify(NOTIFICATION_ALERT_ID, mBuilder.build());
+//        NotificationManager mNotificationManager =
+//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        NotificationCompat.Builder mBuilder =
+//                new NotificationCompat.Builder(this)
+//                        .setSmallIcon(android.R.drawable.stat_sys_warning)
+//                        .setContentTitle("New Discount")
+//                        .setContentText(msg);
+//
+//        //TODO decide where to go: MainActivity or discount info activity
+//        Intent notIntent =  new Intent(this, MainActivity.class);
+//        PendingIntent contIntent = PendingIntent.getActivity(
+//                this, 0, notIntent, 0);
+//
+//        mBuilder.setContentIntent(contIntent);
+//
+//        mNotificationManager.notify(NOTIFICATION_ALERT_ID, mBuilder.build());
     }
 }

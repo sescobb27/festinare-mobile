@@ -22,6 +22,7 @@ import java.util.Map;
 
 import com.festinare.discount.models.Mobile;
 import com.festinare.discount.models.User;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 public class UserHelper {
 
@@ -64,5 +65,11 @@ public class UserHelper {
         SessionHelper session = new SessionHelper(context);
         client.addHeader("Authorization", "Bearer " + session.getAPIToken());
         client.put(context, url, null, entity, "application/json", responseHandler);
+    }
+
+    public void getDiscounts(Context context, JsonHttpResponseHandler responseHandler){
+        SessionHelper session = new SessionHelper(context);
+        client.addHeader("Authorization", "Bearer " + session.getAPIToken());
+        client.get(context, HTTPCommons.GET_AVAILABLE_DISCOUNTS_URL, null, null, responseHandler);
     }
 }

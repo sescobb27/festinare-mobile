@@ -53,6 +53,23 @@ public class MainActivity extends AppCompatActivity implements CategoriesPickerF
             DialogFragment categoriesPickerFragment = new CategoriesPickerFragment();
             categoriesPickerFragment.show(getSupportFragmentManager(), "timePicker");
         }
+
+        UserHelper userHelper = new UserHelper();
+
+        userHelper.getDiscounts(this,
+        new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.i("Discounts: ", response.toString());
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+
+            }
+        });
     }
 
     @Override
